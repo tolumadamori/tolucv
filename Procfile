@@ -1,1 +1,1 @@
-web: bin/resume-app-starter-files
+web: bin/tolucv

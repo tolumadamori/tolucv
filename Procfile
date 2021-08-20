@@ -1,1 +1,1 @@
-web: bin/tolucv
+web: ./bin/m

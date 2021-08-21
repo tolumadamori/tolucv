@@ -88,6 +88,6 @@ func main() {
 	//for local host uncomment below line
 	//log.Fatal(http.ListenAndServe(":8080", r))
 	//for web service
-	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), r))
+	log.Fatal(http.ListenAndServe(":"+os.Getenv("HOST","PORT"), r))
 
 }

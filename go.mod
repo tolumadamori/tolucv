@@ -1,5 +1,5 @@
 module hngtask2/m
-
+// +heroku goVersion go1.11
 go 1.16
 
 require (

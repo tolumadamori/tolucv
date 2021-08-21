@@ -60,7 +60,7 @@ func submit(w http.ResponseWriter, r *http.Request) {
 		Message: submittedMessage}
 
 	//connect to database
-	psqlconn := fmt.Sprintf( password=%s dbname=%s sslmode=require" user, password, dbname)
+	psqlconn := fmt.Sprintf( "user=%s password=%s dbname=%s sslmode=require", user, password, dbname)
 
 	//create record
 	db, err := gorm.Open(postgres.Open(psqlconn), &gorm.Config{})

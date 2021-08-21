@@ -15,8 +15,8 @@ import (
 
 //database code
 const (
-	host     = "localhost"
-	port     = 5432
+	
+	
 	user     = "postgres"
 	password = "..toluwani"
 	dbname   = "visitors_db"
@@ -62,7 +62,7 @@ func submit(w http.ResponseWriter, r *http.Request) {
 		Message: submittedMessage}
 
 	//connect to database
-	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	psqlconn := fmt.Sprintf( password=%s dbname=%s sslmode=require", user, password, dbname)
 
 	//create record
 	db, err := gorm.Open(postgres.Open(psqlconn), &gorm.Config{})

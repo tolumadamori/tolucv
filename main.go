@@ -1,13 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 //database code
@@ -26,26 +28,20 @@ var tpl2 *template.Template
 func init() {
 	tpl = template.Must(template.ParseFiles("assets/index.gohtml"))
 	tpl2 = template.Must(template.ParseFiles("assets/submit.gohtml"))
+	//handle func called in main func with r.handlefunc this only a failsafe
+	//http.HandleFunc("/save", submit)
 }
 
-type datatoinput struct {
+type Visitor struct {
+	gorm.Model
 	Name    string
 	Email   string
 	Message string
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	submittedName := r.FormValue("yname")
-	submittedEmail := r.FormValue("yemail")
-	submittedMessage := r.FormValue("ymessage")
-	d := datatoinput{
-
-		Name:    submittedName,
-		Email:   submittedEmail,
-		Message: submittedMessage,
-	}
 	w.Header().Set("Content-Type", "text/html")
-	if err := tpl.Execute(w, d); err != nil {
+	if err := tpl.Execute(w, nil); err != nil {
 		panic(err)
 	}
 
@@ -53,7 +49,28 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 func submit(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	if err := tpl2.Execute(w, nil); err != nil {
+	submittedName := r.FormValue("yname")
+	submittedEmail := r.FormValue("ymail")
+	submittedMessage := r.FormValue("ymessage")
+
+	//create visitors details struct
+	data := &Visitor{
+
+		Name:    submittedName,
+		Email:   submittedEmail,
+		Message: submittedMessage}
+
+	//connect to database
+	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+
+	//create record
+	db, err := gorm.Open(postgres.Open(psqlconn), &gorm.Config{})
+	if err != nil {
+		panic(err.Error())
+	}
+
+	result := db.Create(&data)
+	if err := tpl2.Execute(w, result); err != nil {
 		panic(err)
 	}
 
@@ -61,24 +78,6 @@ func submit(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	// //connect to database
-	// psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-
-	// db, err := sql.Open("postgres", psqlconn)
-	// if err != nil {
-	//     panic(err.Error())
-	// defer db.Close()
-
-	// insertStmt := `insert into "Visitors"("Name", "email", "message") values(submittedName, submittedEmail, submittedMessage)`
-	// _, e := db.Exec(insertStmt)
-	// CheckError(e)
-
-	// insertDynStmt := `insert into "Visitors"("Name", "email", "message") values($1, $2,$3, )`
-	// _, a := db.Exec(insertDynStmt, "toba", "tobamadamori", "bro")
-	// CheckError(a)
-	// insert, err := db.Query("INSERT INTO Visitors VALUES (submittedName, submittedEmail, submittedMessage )")
-	// if err != nil {
-	//     panic(err.Error())
 	//initialize routers
 	r := mux.NewRouter()
 	r.HandleFunc("/", index).Methods("GET")
@@ -87,6 +86,12 @@ func main() {
 	//serve static files
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./assets/")))
 
+	//for local host uncomment below line
+	//log.Fatal(http.ListenAndServe(":8080", r))
+	//for web service
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), r))
 
 }
+
+
+

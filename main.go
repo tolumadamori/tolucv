@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -92,6 +93,4 @@ func main() {
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), r))
 
 }
-
-
 

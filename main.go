@@ -15,7 +15,6 @@ import (
 
 //database code
 const (
-	url= "postgres://vuuqbghzjegyvk:5d0dc4f72d109d2bb5d2c652fe743db2570dcac033f0cb16b83c55464484da05@ec2-52-72-125-94.compute-1.amazonaws.com:5432/d8r669a0v2gin6"
 	host= "ec2-52-72-125-94.compute-1.amazonaws.com"
 	user   = "vuuqbghzjegyvk"
 	password = "5d0dc4f72d109d2bb5d2c652fe743db2570dcac033f0cb16b83c55464484da05"
@@ -62,7 +61,7 @@ func submit(w http.ResponseWriter, r *http.Request) {
 		Message: submittedMessage}
 
 	//connect to database
-	psqlconn := fmt.Sprintf( "url=%s host=%s user=%s password=%s dbname=%s sslmode=require", url, host, user, password, dbname)
+	psqlconn := fmt.Sprintf( "host=%s user=%s password=%s dbname=%s sslmode=require", host, user, password, dbname)
 
 	//create record
 	db, err := gorm.Open(postgres.Open(psqlconn), &gorm.Config{})
